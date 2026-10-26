@@ -1,3 +1,12 @@
+> **Fork note** — patched copy of [wlcrs/huawei_solar](https://github.com/wlcrs/huawei_solar).
+> Home Assistant 2026.5 removed `via_device_id` from `DeviceInfo` and from
+> `DeviceRegistry.async_get_or_create()`, so upstream 2.1.5 fails to set up any
+> device that has a parent (second inverter, power meter, battery, optimizers).
+> This release replaces it with the `via_device` tuple form. Upstream PR:
+> [wlcrs/huawei_solar#1454](https://github.com/wlcrs/huawei_solar/pull/1454).
+> Install as a HACS custom repository (`ysamjo/huawei_solar`, category *Integration*)
+> and switch back to upstream once the PR is merged.
+
 # Huawei Solar Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
