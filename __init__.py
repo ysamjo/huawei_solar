@@ -231,7 +231,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HuaweiSolarConfigEntry) 
                 hass,
                 entry,
                 sub_device,
-                via_device_id=primary_device_data.ha_device_id,
+                via_device=(DOMAIN, primary_device.serial_number),
             )
 
             device_datas.append(sub_device_data)
@@ -340,7 +340,7 @@ async def _setup_inverter_device_data(
     entry: ConfigEntry,
     device: SUN2000Device,
     *,
-    via_device_id: str | None = None,
+    via_device: tuple[str, str] | None = None,
 ) -> HuaweiSolarInverterData:
     device_registry = dr.async_get(hass)
 
@@ -351,7 +351,7 @@ async def _setup_inverter_device_data(
         model=device.model_name,
         serial_number=device.serial_number,
         sw_version=device.software_version,
-        via_device_id=via_device_id,
+        via_device=via_device,
     )
 
     # Add inverter device to device registery
@@ -362,7 +362,7 @@ async def _setup_inverter_device_data(
         name=device.model_name,
         model=device.model_name,
         sw_version=device.software_version,
-        via_device_id=via_device_id,
+        via_device=via_device,
     )
 
     update_coordinator = HuaweiSolarUpdateCoordinator(
@@ -380,7 +380,7 @@ async def _setup_inverter_device_data(
                 (DOMAIN, f"{device.serial_number}/power_meter"),
             },
             translation_key="power_meter",
-            via_device_id=ha_device.id,
+            via_device=(DOMAIN, device.serial_number),
         )
         power_meter_update_coordinator = HuaweiSolarUpdateCoordinator(
             hass,
@@ -402,7 +402,7 @@ async def _setup_inverter_device_data(
             translation_key="connected_energy_storage",
             model="Batteries",
             manufacturer=inverter_device_info.get("manufacturer"),
-            via_device_id=ha_device.id,
+            via_device=(DOMAIN, device.serial_number),
         )
 
         energy_storage_update_coordinator = HuaweiSolarUpdateCoordinator(
@@ -424,7 +424,7 @@ async def _setup_inverter_device_data(
             translation_key="battery_1",
             manufacturer=_battery_product_model_to_manufacturer(device.battery_1_type),
             model=_battery_product_model_to_model(device.battery_1_type),
-            via_device_id=ha_device.id,
+            via_device=(DOMAIN, device.serial_number),
         )
     else:
         battery_1_device_info = None
@@ -437,7 +437,7 @@ async def _setup_inverter_device_data(
             translation_key="battery_2",
             manufacturer=_battery_product_model_to_manufacturer(device.battery_2_type),
             model=_battery_product_model_to_model(device.battery_2_type),
-            via_device_id=ha_device.id,
+            via_device=(DOMAIN, device.serial_number),
         )
     else:
         battery_2_device_info = None
@@ -462,7 +462,7 @@ async def _setup_inverter_device_data(
                     manufacturer="Huawei",
                     model=optimizer.model,
                     sw_version=optimizer.software_version,
-                    via_device_id=ha_device.id,
+                    via_device=(DOMAIN, device.serial_number),
                 )
                 for optimizer_id, optimizer in optimizer_system_infos.items()
             }
@@ -551,12 +551,12 @@ async def _setup_device_data(
     entry: ConfigEntry,
     device: HuaweiSolarDevice,
     *,
-    via_device_id: str | None = None,
+    via_device: tuple[str, str] | None = None,
 ) -> HuaweiSolarDeviceData:
     """Create the correct DeviceInfo-objects, which can be used to correctly assign to entities in this integration."""
     if isinstance(device, SUN2000Device):
         return await _setup_inverter_device_data(
-            hass, entry, device, via_device_id=via_device_id
+            hass, entry, device, via_device=via_device
         )
 
     device_registry = dr.async_get(hass)
@@ -570,7 +570,7 @@ async def _setup_device_data(
         model=device.model_name,
         serial_number=device.serial_number,
         sw_version=sw_version,
-        via_device_id=via_device_id,
+        via_device=via_device,
     )
 
     # Add device to device registery
@@ -581,7 +581,7 @@ async def _setup_device_data(
         name=device.model_name,
         model=device.model_name,
         sw_version=sw_version,
-        via_device_id=via_device_id,
+        via_device=via_device,
     )
 
     update_coordinator = HuaweiSolarUpdateCoordinator(
